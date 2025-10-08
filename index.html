@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Encuentra un técnico — Landing</title>
+  <meta name="description" content="Solicita servicios de techado, plomería y electricidad. Envíanos fotos, explica el problema y te conectamos con técnicos locales.">
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <style>
+    :root{--accent:#0ea5a4;--muted:#6b7280;--bg:#f8fafc}
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;margin:0;background:var(--bg);color:#0f172a}
+    .container{max-width:980px;margin:28px auto;padding:24px}
+    header{display:flex;gap:16px;align-items:center}
+    .logo{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,#06b6d4,#3b82f6);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+    h1{margin:0;font-size:24px}
+    p.lead{color:var(--muted);margin-top:6px}
+
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:18px;margin-top:18px}
+    .card{background:white;border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(12,18,36,0.06)}
+
+    /* Form */
+    form .row{display:flex;gap:10px;margin-bottom:12px}
+    label{font-size:13px;color:var(--muted);margin-bottom:6px;display:block}
+    input[type=text],input[type=tel],select,textarea{width:100%;padding:10px;border:1px solid #e6e9ef;border-radius:8px;font-size:15px}
+    textarea{min-height:110px;resize:vertical}
+    .btn{background:var(--accent);color:white;padding:10px 14px;border-radius:9px;border:0;font-weight:600;cursor:pointer}
+    .btn.secondary{background:transparent;color:var(--accent);border:1px solid #c7f0ee}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* Chat widget */
+    .chat-window{display:flex;flex-direction:column;height:560px}
+    .messages{flex:1;overflow:auto;padding:12px;gap:8px;display:flex;flex-direction:column}
+    .msg{max-width:78%;padding:10px;border-radius:10px}
+    .msg.bot{align-self:flex-start;background:#eefbf9;border:1px solid #dff3ef}
+    .msg.user{align-self:flex-end;background:#0ea5a4;color:white}
+    .chat-input{display:flex;gap:8px;padding:12px;border-top:1px solid #eef2f7}
+    .chip{display:inline-block;padding:6px 8px;border-radius:999px;background:#f1f5f9;border:1px solid #e2e8f0;font-size:13px;margin-right:6px}
+
+    /* Responsive */
+    @media (max-width:980px){.grid{grid-template-columns:1fr}.chat-window{height:420px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">TM</div>
+      <div>
+        <h1>Encuentra técnicos locales — plomería, electricidad, techos</h1>
+        <p class="lead">Describe tu problema por chat, sube fotos y te conectamos con hasta 3 técnicos disponibles en tu zona.</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Información + form de captura tradicional (SEO friendly) -->
+      <section class="card">
+        <h2>Solicita un técnico ahora</h2>
+        <p class="small">Rellena rápido (o usa el chat a la derecha). Guardaremos tus datos y los compartiremos solo con técnicos verificados si das tu consentimiento.</p>
+        <form id="lead-form">
+          <div class="row">
+            <div style="flex:1">
+              <label for="name">Nombre</label>
+              <input id="name" name="name" type="text" placeholder="Ej. María Pérez" required>
+            </div>
+            <div style="width:160px">
+              <label for="phone">Teléfono</label>
+              <input id="phone" name="phone" type="tel" placeholder="+51 9XXXXXXXX" required>
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="flex:1">
+              <label for="category">Tipo de servicio</label>
+              <select id="category" name="category">
+                <option value="plomeria">Plomería</option>
+                <option value="electricidad">Electricidad</option>
+                <option value="techado">Techado / Techo</option>
+                <option value="otro">Otro (limpieza, albañilería)</option>
+              </select>
+            </div>
+            <div style="width:160px">
+              <label for="urgency">Urgencia</label>
+              <select id="urgency" name="urgency">
+                <option value="ahora">Ahora</option>
+                <option value="esta_semana">Esta semana</option>
+                <option value="flexible">Flexible</option>
+              </select>
+            </div>
+          </div>
+
+          <label for="address">Dirección (o barrio)</label>
+          <input id="address" name="address" type="text" placeholder="Av. ejemplo 123, Lima">
+
+          <label for="budget">Presupuesto estimado (opcional)</label>
+          <input id="budget" name="budget" type="text" placeholder="S/ 150 - S/ 500">
+
+          <label for="description">Describe el problema</label>
+          <textarea id="description" name="description" placeholder="Ej. fuga en tubería del baño, techo con filtración solo cuando llueve..."></textarea>
+
+          <div style="margin-top:8px;margin-bottom:12px">
+            <label class="small">Sube fotos (máx 4)</label>
+            <input id="photos" name="photos" type="file" accept="image/*" multiple>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+            <input id="consent" type="checkbox" checked>
+            <label for="consent" class="small">Acepto que mis datos sean usados para contactarme con técnicos.</label>
+          </div>
+
+          <div style="display:flex;gap:8px">
+            <button class="btn" type="submit">Enviar solicitud</button>
+            <button id="use-chat" type="button" class="btn secondary">Usar chat</button>
+          </div>
+
+          <p id="status" class="small" style="margin-top:10px"></p>
+        </form>
+
+        <hr style="margin:18px 0;border:none;border-top:1px solid #f1f5f9">
+        <h3>¿Por qué funciona?</h3>
+        <ul class="small">
+          <li>Captura datos + fotos para leads de calidad.</li>
+          <li>Matching por ubicación y urgencia.</li>
+          <li>Notificaciones inmediatas a técnicos.</li>
+        </ul>
+      </section>
+
+      <!-- RIGHT: Chatbot widget -->
+      <aside class="card chat-window" aria-label="Chatbot de captura">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div>
+            <strong>Asistente</strong>
+            <div class="small">Chat rápido para describir tu problema</div>
+          </div>
+          <div class="small">Tiempo de respuesta: <span id="estimate">~1 min</span></div>
+        </div>
+
+        <div id="messages" class="messages" role="log" aria-live="polite">
+          <div class="msg bot">Hola 👋 ¿En qué te puedo ayudar hoy? (ej: "fuga en baño, Lima Norte")</div>
+        </div>
+
+        <div class="chat-input">
+          <input id="chat-input" type="text" placeholder="Escribe tu mensaje..." style="flex:1;padding:10px;border-radius:8px;border:1px solid #e6e9ef">
+          <button id="send-chat" class="btn">Enviar</button>
+        </div>
+      </aside>
+    </div>
+
+    <footer style="text-align:center;margin-top:18px;color:var(--muted)">Hecho con ❤️ — Pon el dominio y configura tu backend para recibir los leads.</footer>
+  </div>
+
+  <script>
+    // --- Helpers ---
+    const $ = id => document.getElementById(id);
+
+    // Form submission -- attempts to post to /api/leads, falls back to localStorage
+    document.getElementById('lead-form').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const status = $('status'); status.textContent = 'Enviando...';
+
+      const data = new FormData(e.target);
+      const payload = {
+        name: data.get('name'), phone: data.get('phone'), category: data.get('category'),
+        urgency: data.get('urgency'), address: data.get('address'), budget: data.get('budget'),
+        description: data.get('description'), consent: data.get('consent') === 'on', created_at: new Date().toISOString()
+      };
+
+      // handle photos: convert to base64 small preview (optional)
+      const files = $('photos').files;
+      const photos = [];
+      for (let i=0;i<files.length && i<4;i++){
+        const f = files[i];
+        photos.push(await fileToBase64(f));
+      }
+      payload.photos = photos;
+
+      try {
+           const res = await fetch('http://localhost:3000/api/leads', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify(payload)
+           });
+
+     if (res.ok) {
+             status.textContent = '✅ Solicitud enviada. En breve un técnico se contactará contigo.';
+             e.target.reset();
+
+             // ⏱️ Ocultar mensaje después de 4 segundos
+                setTimeout(() => {
+                status.textContent = '';
+                 }, 4000);
+
+                 } else {
+                   throw new Error('no backend');
+            }
+
+    } catch (err) {
+          const backlog = JSON.parse(localStorage.getItem('leads_backlog') || '[]');
+          backlog.push(payload);
+          localStorage.setItem('leads_backlog', JSON.stringify(backlog));
+          status.textContent = '⚠️ Enviado localmente (sin backend). Cuando conectes tu servidor, podrás reenviarlos.';
+
+         // Ocultar mensaje después de 5 segundos
+             setTimeout(() => {
+             status.textContent = '';
+             }, 5000);
+         }
+    });
+
+    function fileToBase64(file){
+      return new Promise((res,rej)=>{
+        const r = new FileReader(); r.onload = ()=>res(r.result); r.onerror = rej; r.readAsDataURL(file);
+      });
+    }
+
+    // Chatbot: very simple conversational capture. You can replace this with an LLM-powered backend.
+    const messages = $('messages');
+    const chatInput = $('chat-input');
+
+    const convo = {name:null,phone:null,category:null,description:null,address:null,urgency:null,budget:null,photos:[]};
+    const script = [
+      {field:'name', q:'¿Cuál es tu nombre? (o dime "prefiero no decirlo")'},
+      {field:'phone', q:'¿Cuál es tu teléfono para que el técnico pueda contactarte?' },
+      {field:'category', q:'¿Qué servicio necesitas? (plomería / electricidad / techado / otro)'},
+      {field:'description', q:'Cuéntame en 1 o 2 líneas qué pasa.'},
+      {field:'address', q:'¿Dónde es el trabajo? zona o dirección.'},
+      {field:'urgency', q:'¿Urgente, esta semana o flexible?'}
+    ];
+    let idx = 0; // index in script
+
+    function appendMsg(text,who='bot'){
+      const d = document.createElement('div'); d.className = 'msg '+(who==='bot'?'bot':'user'); d.textContent = text; messages.appendChild(d); messages.scrollTop = messages.scrollHeight;
+    }
+
+    $('send-chat').addEventListener('click', onSendChat);
+    chatInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') onSendChat(); });
+
+    function onSendChat(){
+      const v = chatInput.value.trim(); if(!v) return;
+      appendMsg(v,'user'); chatInput.value='';
+
+      // store into current field if waiting
+      if(idx < script.length){
+        const f = script[idx].field;
+        convo[f] = v;
+        idx++;
+        setTimeout(()=> appendMsg(script[idx] ? script[idx].q : 'Gracias — ¿Quieres que enviemos tu solicitud ahora? (sí/no)'), 600);
+      } else {
+        // conversation ended: final step
+        if(/^(si|sí|s)$/i.test(v)){
+          appendMsg('Perfecto, enviando tu solicitud...');
+          sendConvoAsLead();
+        } else {
+          appendMsg('Ok, si cambias de opinión escríbeme y te ayudo.');
+        }
+      }
+    }
+
+    // start conversation on page load
+    setTimeout(()=> appendMsg(script[0].q),700);
+
+    async function sendConvoAsLead(){
+      const status = $('status'); status.textContent = 'Enviando...';
+      const payload = {...convo, created_at:new Date().toISOString(), consent:true};
+      try{
+        const res = await fetch('/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+        if(res.ok){ appendMsg('Solicitud enviada ✅ Un técnico se comunicará contigo.'); status.textContent = 'Solicitud enviada desde chat.'; resetConvo(); }
+        else throw new Error('no backend');
+      }catch(err){
+        const backlog = JSON.parse(localStorage.getItem('leads_backlog')||'[]'); backlog.push(payload); localStorage.setItem('leads_backlog', JSON.stringify(backlog)); appendMsg('Solicitud guardada localmente (sin backend).'); status.textContent = 'Guardado localmente.'; resetConvo(); }
+    }
+
+    function resetConvo(){ idx=0; for(let k in convo) convo[k]=null; setTimeout(()=> appendMsg(script[0].q),800); }
+
+    // Use chat button toggles focus to chat widget
+    $('use-chat').addEventListener('click', ()=>{ chatInput.focus(); appendMsg('Te llevo al chat — cuéntame tu problema'); });
+
+    // Optional: attempt to resend backlog when backend available
+    async function tryFlushBacklog(){
+      const backlog = JSON.parse(localStorage.getItem('leads_backlog')||'[]');
+      if(backlog.length===0) return;
+      for(const item of backlog){
+        try{
+          const res = await fetch('http://localhost:3000/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)});
+          if(res.ok){
+            // remove flushed item
+            const remaining = JSON.parse(localStorage.getItem('leads_backlog')||'[]').slice(1);
+            localStorage.setItem('leads_backlog', JSON.stringify(remaining));
+          } else break;
+        }catch(e){ break; }
+      }
+    }
+
+    // check backend every 30s
+    setInterval(tryFlushBacklog,30000);
+
+    // Geolocation helper (optional) to autofill address
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(async (pos)=>{
+        const lat = pos.coords.latitude; const lng = pos.coords.longitude;
+        // simple reverse geocoding using OpenStreetMap Nominatim (client-side)
+        try{
+          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
+          const j = await r.json();
+          if(j.display_name){ $('address').value = j.display_name; }
+        }catch(e){}
+      }, ()=>{} );
+    }
+
+  </script>
+</body>
+</html>
+
+
