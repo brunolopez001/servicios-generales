@@ -174,7 +174,7 @@
       payload.photos = photos;
 
       try {
-           const res = await fetch('http://localhost:3000/api/leads', {
+           const res = await fetch('http://my-rep-lead.vercel.app/api/leads', {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify(payload)
