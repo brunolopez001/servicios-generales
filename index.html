@@ -174,36 +174,37 @@
       payload.photos = photos;
 
       try {
-           const res = await fetch('http://my-rep-lead.vercel.app/api/leads', {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify(payload)
-           });
+  const res = await fetch('http://localhost:3000/api/leads', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
 
-     if (res.ok) {
-             status.textContent = '✅ Solicitud enviada. En breve un técnico se contactará contigo.';
-             e.target.reset();
+  if (res.ok) {
+    status.textContent = '✅ Solicitud enviada. En breve un técnico se contactará contigo.';
+    e.target.reset();
 
-             // ⏱️ Ocultar mensaje después de 4 segundos
-                setTimeout(() => {
-                status.textContent = '';
-                 }, 4000);
+    // ⏱️ Ocultar mensaje después de 4 segundos
+    setTimeout(() => {
+      status.textContent = '';
+    }, 4000);
 
-                 } else {
-                   throw new Error('no backend');
-            }
+  } else {
+    throw new Error('no backend');
+  }
 
-    } catch (err) {
-          const backlog = JSON.parse(localStorage.getItem('leads_backlog') || '[]');
-          backlog.push(payload);
-          localStorage.setItem('leads_backlog', JSON.stringify(backlog));
-          status.textContent = '⚠️ Enviado localmente (sin backend). Cuando conectes tu servidor, podrás reenviarlos.';
+} catch (err) {
+  const backlog = JSON.parse(localStorage.getItem('leads_backlog') || '[]');
+  backlog.push(payload);
+  localStorage.setItem('leads_backlog', JSON.stringify(backlog));
+  status.textContent = '⚠️ Enviado localmente (sin backend). Cuando conectes tu servidor, podrás reenviarlos.';
 
-         // Ocultar mensaje después de 5 segundos
-             setTimeout(() => {
-             status.textContent = '';
-             }, 5000);
-         }
+  // Ocultar mensaje después de 5 segundos
+  setTimeout(() => {
+    status.textContent = '';
+  }, 5000);
+}
+
     });
 
     function fileToBase64(file){
@@ -227,9 +228,15 @@
     ];
     let idx = 0; // index in script
 
-    function appendMsg(text,who='bot'){
-      const d = document.createElement('div'); d.className = 'msg '+(who==='bot'?'bot':'user'); d.textContent = text; messages.appendChild(d); messages.scrollTop = messages.scrollHeight;
-    }
+    function appendMsg(text, who = 'bot') {
+  const d = document.createElement('div');
+  d.className = 'msg ' + (who === 'bot' ? 'bot' : 'user');
+  d.textContent = text;
+  messages.appendChild(d);
+  messages.scrollTop = messages.scrollHeight;
+  return d; // ✅ Devuelve el elemento para poder eliminarlo luego
+}
+
 
     $('send-chat').addEventListener('click', onSendChat);
     chatInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') onSendChat(); });
@@ -258,16 +265,51 @@
     // start conversation on page load
     setTimeout(()=> appendMsg(script[0].q),700);
 
-    async function sendConvoAsLead(){
-      const status = $('status'); status.textContent = 'Enviando...';
-      const payload = {...convo, created_at:new Date().toISOString(), consent:true};
-      try{
-        const res = await fetch('/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-        if(res.ok){ appendMsg('Solicitud enviada ✅ Un técnico se comunicará contigo.'); status.textContent = 'Solicitud enviada desde chat.'; resetConvo(); }
-        else throw new Error('no backend');
-      }catch(err){
-        const backlog = JSON.parse(localStorage.getItem('leads_backlog')||'[]'); backlog.push(payload); localStorage.setItem('leads_backlog', JSON.stringify(backlog)); appendMsg('Solicitud guardada localmente (sin backend).'); status.textContent = 'Guardado localmente.'; resetConvo(); }
+    async function sendConvoAsLead() {
+  const sendingMsg = appendMsg('Enviando solicitud...');
+
+  try {
+    const res = await fetch('http://localhost:3000/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(convo)
+    });
+    const data = await res.json();
+
+    // Eliminar mensaje "Enviando solicitud..."
+    if (sendingMsg && sendingMsg.parentNode) sendingMsg.remove();
+
+    if (data.ok) {
+      const msgEl = appendMsg('✅ Solicitud enviada correctamente.');
+
+      // 🔥 Ocultar con animación después de 4 segundos
+      setTimeout(() => {
+        msgEl.classList.add('fade-out');
+        setTimeout(() => {
+          if (msgEl && msgEl.parentNode) msgEl.parentNode.removeChild(msgEl);
+
+          // 🧹 Limpiar conversación completamente
+          messages.innerHTML = '';
+          idx = 0; // reinicia índice del script
+          for (let k in convo) convo[k] = null;
+
+          // 🟢 Mostrar nuevo saludo inicial
+          appendMsg('Hola 👋 ¿En qué te puedo ayudar hoy? (ej: "fuga en baño, Lima Norte")');
+          setTimeout(() => appendMsg(script[0].q), 800);
+        }, 800);
+      }, 4000);
+    } else {
+      appendMsg('Hubo un error al enviar la solicitud.');
     }
+  } catch (err) {
+    console.error(err);
+    appendMsg('Error de conexión con el servidor.');
+  }
+}
+
+
+
+
 
     function resetConvo(){ idx=0; for(let k in convo) convo[k]=null; setTimeout(()=> appendMsg(script[0].q),800); }
 
@@ -309,5 +351,6 @@
   </script>
 </body>
 </html>
+
 
 

@@ -1,5 +1,3 @@
-// server.js
-// Simple Express API to receive leads and save to MongoDB using Mongoose
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
